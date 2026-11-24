@@ -5,7 +5,6 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 
 # 1. 공항 목록 읽기
 with open("airports.txt", "r", encoding="utf-8") as f:
@@ -60,13 +59,13 @@ def parse_latest_metar(metar_line):
 
     return {"wind": wind, "vis": vis, "temp": temp, "qnh": qnh, "cat": cat}
 
-# 4. 공항 페이지 우측 패널의 항공용 Meteogram 전체 너비 캡처
+# 4. 공항 페이지 우측 패널의 항공용 Meteogram 전체 너비 캡처 (초기화 + 최대 3회 재시도)
 def capture_windy_airport_meteogram(airports):
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=3200,1600")
+    options.add_argument("--window-size=1920,1400")
     options.add_argument("--force-device-scale-factor=1")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
@@ -75,77 +74,95 @@ def capture_windy_airport_meteogram(airports):
 
     try:
         for icao in airports:
-            print(f"[{icao}] Windy 공항 페이지 접속...", flush=True)
             img_path = f"images/{icao}.png"
-            try:
-                driver.get(f"https://www.windy.com/airport/{icao}")
-                time.sleep(7)
+            success = False
 
-                # 공항 패널 내 Meteogram 영역 탐색 및 스크롤 유도
-                target = None
-                for _ in range(10):
-                    target = driver.execute_script("""
-                        // 1. 'Meteogram' 텍스트 제목 바로 아래의 흰색 카드 탐색
-                        const els = Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span,p'));
-                        const titleEl = els.find(e => e.children.length === 0 && e.textContent.trim() === 'Meteogram');
-                        if (titleEl) {
-                            titleEl.scrollIntoView({block: 'center'});
-                            let next = titleEl.nextElementSibling;
-                            if (next && next.offsetHeight > 100) return next;
-                            if (titleEl.parentElement && titleEl.parentElement.nextElementSibling) {
-                                return titleEl.parentElement.nextElementSibling;
+            for attempt in range(1, 4):
+                print(f"[{icao}] Windy 공항 페이지 접속 (시도 {attempt}/3)...", flush=True)
+                try:
+                    # 이전 공항 상태 및 창 크기 초기화
+                    driver.get("about:blank")
+                    driver.set_window_size(1920, 1400)
+                    time.sleep(1)
+
+                    driver.get(f"https://www.windy.com/airport/{icao}")
+                    time.sleep(7)
+
+                    # 공항 패널 스크롤 및 Meteogram 영역 탐색
+                    target = None
+                    for _ in range(12):
+                        target = driver.execute_script("""
+                            // 공항 패널 내부 스크롤을 아래로 내려 Meteogram 지연 로딩 유도
+                            document.querySelectorAll('#plugin-airport, .plugin-airport, [class*="airport"]').forEach(p => {
+                                if (p.scrollHeight > p.clientHeight) {
+                                    p.scrollTop = p.scrollHeight;
+                                }
+                            });
+
+                            // 1. 'Meteogram' 텍스트 제목 바로 아래의 흰색 카드 탐색
+                            const els = Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span,p'));
+                            const titleEl = els.find(e => e.children.length === 0 && e.textContent.trim() === 'Meteogram');
+                            if (titleEl) {
+                                titleEl.scrollIntoView({block: 'center'});
+                                let next = titleEl.nextElementSibling;
+                                if (next && next.offsetHeight > 100) return next;
+                                if (titleEl.parentElement && titleEl.parentElement.nextElementSibling) {
+                                    return titleEl.parentElement.nextElementSibling;
+                                }
                             }
+                            // 2. 클래스명 기반 백업 탐색
+                            const byClass = document.querySelector('#plugin-airport .meteogram, .plugin-airport .meteogram, [class*="meteogram"]');
+                            if (byClass && byClass.offsetHeight > 100) {
+                                byClass.scrollIntoView({block: 'center'});
+                                return byClass;
+                            }
+                            return null;
+                        """)
+                        if target:
+                            break
+                        time.sleep(2)
+
+                    if not target:
+                        raise Exception("공항 패널에서 Meteogram 영역을 찾지 못했습니다.")
+
+                    time.sleep(3)
+
+                    # 가로 스크롤 제한 해제하여 7일치 전체가 한눈에 펼쳐지도록 확장
+                    dims = driver.execute_script("""
+                        const el = arguments[0];
+                        let p = el;
+                        for (let i = 0; i < 8 && p && p !== document.body; i++) {
+                            p.style.setProperty('overflow', 'visible', 'important');
+                            p.style.setProperty('max-width', 'none', 'important');
+                            p.style.setProperty('width', 'auto', 'important');
+                            p = p.parentElement;
                         }
-                        // 2. 클래스명 기반 백업 탐색
-                        const byClass = document.querySelector('#plugin-airport .meteogram, .plugin-airport .meteogram, [class*="meteogram"]');
-                        if (byClass && byClass.offsetHeight > 100) {
-                            byClass.scrollIntoView({block: 'center'});
-                            return byClass;
-                        }
-                        return null;
-                    """)
-                    if target:
-                        break
-                    time.sleep(2)
+                        el.querySelectorAll('*').forEach(child => {
+                            const style = window.getComputedStyle(child);
+                            if (style.overflowX === 'auto' || style.overflowX === 'scroll' || style.overflow === 'hidden') {
+                                child.style.setProperty('overflow', 'visible', 'important');
+                                child.style.setProperty('max-width', 'none', 'important');
+                            }
+                        });
+                        el.scrollIntoView({block: 'start', inline: 'start'});
+                        return [el.scrollWidth, el.scrollHeight];
+                    """, target)
 
-                if not target:
-                    raise Exception("공항 패널에서 Meteogram 영역을 찾지 못했습니다.")
+                    time.sleep(1.5)
+                    w, h = dims[0], dims[1]
+                    driver.set_window_size(max(w + 200, 2400), max(h + 400, 1400))
+                    time.sleep(1)
 
-                time.sleep(3)
+                    target.screenshot(img_path)
+                    captured[icao] = img_path
+                    print(f" -> [{icao}] 항공용 Meteogram 캡처 완료 ({w}x{h})", flush=True)
+                    success = True
+                    break
+                except Exception as e:
+                    print(f" -> [{icao}] 시도 {attempt} 실패: {e}", flush=True)
+                    time.sleep(3)
 
-                # 가로 스크롤 제한 해제하여 7일치 전체가 한눈에 펼쳐지도록 확장
-                dims = driver.execute_script("""
-                    const el = arguments[0];
-                    // 부모 패널들의 너비 및 overflow 제한 해제
-                    let p = el;
-                    for (let i = 0; i < 8 && p && p !== document.body; i++) {
-                        p.style.setProperty('overflow', 'visible', 'important');
-                        p.style.setProperty('max-width', 'none', 'important');
-                        p.style.setProperty('width', 'auto', 'important');
-                        p = p.parentElement;
-                    }
-                    // 내부 스크롤 영역도 모두 펼침
-                    el.querySelectorAll('*').forEach(child => {
-                        const style = window.getComputedStyle(child);
-                        if (style.overflowX === 'auto' || style.overflowX === 'scroll' || style.overflow === 'hidden') {
-                            child.style.setProperty('overflow', 'visible', 'important');
-                            child.style.setProperty('max-width', 'none', 'important');
-                        }
-                    });
-                    el.scrollIntoView({block: 'start', inline: 'start'});
-                    return [el.scrollWidth, el.scrollHeight];
-                """, target)
-
-                time.sleep(1.5)
-                w, h = dims[0], dims[1]
-                driver.set_window_size(max(w + 200, 2400), max(h + 400, 1400))
-                time.sleep(1)
-
-                target.screenshot(img_path)
-                captured[icao] = img_path
-                print(f" -> [{icao}] 항공용 Meteogram 캡처 완료 ({w}x{h})", flush=True)
-            except Exception as e:
-                print(f" -> [{icao}] 캡처 실패: {e}", flush=True)
+            if not success:
                 captured[icao] = ""
     finally:
         driver.quit()

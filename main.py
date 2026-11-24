@@ -6,8 +6,6 @@ from datetime import datetime, timezone, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 # 1. 공항 목록 읽기
 with open("airports.txt", "r", encoding="utf-8") as f:
@@ -62,77 +60,90 @@ def parse_latest_metar(metar_line):
 
     return {"wind": wind, "vis": vis, "temp": temp, "qnh": qnh, "cat": cat}
 
-# 4. Headless Chrome으로 Windy 7일 예보 표만 DOM 적출 캡처
-def capture_windy(airports):
+# 4. 공항 페이지 우측 패널의 항공용 Meteogram 전체 너비 캡처
+def capture_windy_airport_meteogram(airports):
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=3200,1200")
+    options.add_argument("--window-size=3200,1600")
     options.add_argument("--force-device-scale-factor=1")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
     driver = webdriver.Chrome(options=options)
-    wait = WebDriverWait(driver, 25)
     captured = {}
 
     try:
         for icao in airports:
-            print(f"[{icao}] Windy 예보 표 적출 시작...", flush=True)
+            print(f"[{icao}] Windy 공항 페이지 접속...", flush=True)
             img_path = f"images/{icao}.png"
             try:
                 driver.get(f"https://www.windy.com/airport/{icao}")
-                time.sleep(6)
+                time.sleep(7)
 
-                # 예보 표(Meteogram / Detail table) 대기
-                table_el = wait.until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "#detail-data-table, table.forecast-table, .table-wrapper table"))
-                )
-                time.sleep(2)
+                # 공항 패널 내 Meteogram 영역 탐색 및 스크롤 유도
+                target = None
+                for _ in range(10):
+                    target = driver.execute_script("""
+                        // 1. 'Meteogram' 텍스트 제목 바로 아래의 흰색 카드 탐색
+                        const els = Array.from(document.querySelectorAll('h1,h2,h3,h4,div,span,p'));
+                        const titleEl = els.find(e => e.children.length === 0 && e.textContent.trim() === 'Meteogram');
+                        if (titleEl) {
+                            titleEl.scrollIntoView({block: 'center'});
+                            let next = titleEl.nextElementSibling;
+                            if (next && next.offsetHeight > 100) return next;
+                            if (titleEl.parentElement && titleEl.parentElement.nextElementSibling) {
+                                return titleEl.parentElement.nextElementSibling;
+                            }
+                        }
+                        // 2. 클래스명 기반 백업 탐색
+                        const byClass = document.querySelector('#plugin-airport .meteogram, .plugin-airport .meteogram, [class*="meteogram"]');
+                        if (byClass && byClass.offsetHeight > 100) {
+                            byClass.scrollIntoView({block: 'center'});
+                            return byClass;
+                        }
+                        return null;
+                    """)
+                    if target:
+                        break
+                    time.sleep(2)
 
-                # [핵심] 지도/껍데기 전부 숨기고 예보 표 알맹이만 깨끗한 박스로 적출
-                box = driver.execute_script("""
-                    const table = arguments[0];
-                    const existing = document.getElementById('clean-capture-box');
-                    if (existing) existing.remove();
+                if not target:
+                    raise Exception("공항 패널에서 Meteogram 영역을 찾지 못했습니다.")
 
-                    const box = document.createElement('div');
-                    box.id = 'clean-capture-box';
-                    box.style.position = 'fixed';
-                    box.style.top = '0';
-                    box.style.left = '0';
-                    box.style.zIndex = '9999999';
-                    box.style.background = '#ffffff';
-                    box.style.padding = '12px';
-                    box.style.display = 'inline-block';
+                time.sleep(3)
 
-                    // 표를 통째로 새 박스로 이동 (스타일 및 아이콘 유지)
-                    box.appendChild(table);
-                    document.body.appendChild(box);
-
-                    // 나머지 지도, 팝업, 메뉴 전부 숨김
-                    Array.from(document.body.children).forEach(el => {
-                        if (el.id !== 'clean-capture-box') {
-                            el.style.display = 'none';
+                # 가로 스크롤 제한 해제하여 7일치 전체가 한눈에 펼쳐지도록 확장
+                dims = driver.execute_script("""
+                    const el = arguments[0];
+                    // 부모 패널들의 너비 및 overflow 제한 해제
+                    let p = el;
+                    for (let i = 0; i < 8 && p && p !== document.body; i++) {
+                        p.style.setProperty('overflow', 'visible', 'important');
+                        p.style.setProperty('max-width', 'none', 'important');
+                        p.style.setProperty('width', 'auto', 'important');
+                        p = p.parentElement;
+                    }
+                    // 내부 스크롤 영역도 모두 펼침
+                    el.querySelectorAll('*').forEach(child => {
+                        const style = window.getComputedStyle(child);
+                        if (style.overflowX === 'auto' || style.overflowX === 'scroll' || style.overflow === 'hidden') {
+                            child.style.setProperty('overflow', 'visible', 'important');
+                            child.style.setProperty('max-width', 'none', 'important');
                         }
                     });
-                    document.body.style.background = '#ffffff';
-                    document.body.style.overflow = 'visible';
+                    el.scrollIntoView({block: 'start', inline: 'start'});
+                    return [el.scrollWidth, el.scrollHeight];
+                """, target)
 
-                    return box;
-                """, table_el)
-
+                time.sleep(1.5)
+                w, h = dims[0], dims[1]
+                driver.set_window_size(max(w + 200, 2400), max(h + 400, 1400))
                 time.sleep(1)
 
-                # 표 실제 너비에 맞춰 창 크기 자동 조정 (가로 잘림 방지)
-                width = driver.execute_script("return arguments[0].scrollWidth;", box)
-                height = driver.execute_script("return arguments[0].scrollHeight;", box)
-                driver.set_window_size(max(width + 40, 1400), max(height + 40, 600))
-                time.sleep(0.5)
-
-                box.screenshot(img_path)
+                target.screenshot(img_path)
                 captured[icao] = img_path
-                print(f" -> [{icao}] 적출 캡처 완료 ({width}x{height})", flush=True)
+                print(f" -> [{icao}] 항공용 Meteogram 캡처 완료 ({w}x{h})", flush=True)
             except Exception as e:
                 print(f" -> [{icao}] 캡처 실패: {e}", flush=True)
                 captured[icao] = ""
@@ -146,7 +157,7 @@ kst = timezone(timedelta(hours=9))
 now_kst = datetime.now(kst).strftime("%Y-%m-%d %H:%M KST")
 now_utc = datetime.now(timezone.utc).strftime("%d%H%MZ")
 
-captured_imgs = capture_windy(AIRPORTS)
+captured_imgs = capture_windy_airport_meteogram(AIRPORTS)
 airport_data = []
 
 for icao in AIRPORTS:
@@ -184,7 +195,7 @@ for item in airport_data:
 
     metar_lines_html = "\n".join([f'<div class="metar-line">{line}</div>' for line in item["metars"]])
     img_html = (
-        f'<img src="{item["img"]}?t={int(time.time())}" alt="{icao} 7-day forecast" onclick="openModal(this.src)" loading="lazy">'
+        f'<img src="{item["img"]}?t={int(time.time())}" alt="{icao} Meteogram" onclick="openModal(this.src)" loading="lazy">'
         if item["img"]
         else '<div class="no-img">예보 표를 불러오지 못했습니다.</div>'
     )
@@ -208,7 +219,7 @@ for item in airport_data:
         <div class="metar-list">{metar_lines_html}</div>
       </div>
       <div class="forecast-box">
-        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
         <div class="img-scroll">{img_html}</div>
       </div>
     </section>

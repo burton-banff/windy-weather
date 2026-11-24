@@ -55,7 +55,7 @@
 <header>
   <div class="brand">
     <h1>✈️ Aviation Weather Briefing</h1>
-    <div class="time">최종 업데이트: 2026-11-25 07:30 KST (242230Z)</div>
+    <div class="time">최종 업데이트: 2026-11-25 07:50 KST (242250Z)</div>
   </div>
   <div class="controls">
     <button class="btn" onclick="filterAirport('ALL')">전체 공항 보기</button>
@@ -96,7 +96,7 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>080°/04kt</strong></div>
+        <div><span>WIND</span><strong>080°/03kt</strong></div>
         <div><span>VIS</span><strong>CAVOK (10km+)</strong></div>
         <div><span>TEMP</span><strong>-1°C / -8°C</strong></div>
         <div><span>QNH</span><strong>Q1024</strong></div>
@@ -109,10 +109,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>320°/15kt</strong></div>
+        <div><span>WIND</span><strong>310°/10kt</strong></div>
         <div><span>VIS</span><strong>10km+</strong></div>
-        <div><span>TEMP</span><strong>8°C / -3°C</strong></div>
-        <div><span>QNH</span><strong>Q1011</strong></div>
+        <div><span>TEMP</span><strong>9°C / -3°C</strong></div>
+        <div><span>QNH</span><strong>Q1012</strong></div>
       </div>
     </button>
     
@@ -122,10 +122,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>300°/14kt G24</strong></div>
+        <div><span>WIND</span><strong>300°/13kt G23</strong></div>
         <div><span>VIS</span><strong>10km+</strong></div>
-        <div><span>TEMP</span><strong>9°C / 3°C</strong></div>
-        <div><span>QNH</span><strong>Q1019</strong></div>
+        <div><span>TEMP</span><strong>10°C / 3°C</strong></div>
+        <div><span>QNH</span><strong>Q1020</strong></div>
       </div>
     </button>
     
@@ -135,7 +135,7 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>020°/20kt</strong></div>
+        <div><span>WIND</span><strong>020°/18kt</strong></div>
         <div><span>VIS</span><strong>10km+</strong></div>
         <div><span>TEMP</span><strong>19°C / 12°C</strong></div>
         <div><span>QNH</span><strong>Q1022</strong></div>
@@ -165,7 +165,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKPC.png?t=1795559612" alt="RKPC 7-day forecast" onclick="openModal(this.src, 'RKPC')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     
@@ -191,7 +191,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKSS.png?t=1795559612" alt="RKSS 7-day forecast" onclick="openModal(this.src, 'RKSS')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     
@@ -202,15 +202,16 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>080°/04kt</b></span>
+          <span>WIND <b>080°/03kt</b></span>
           <span>VIS <b>CAVOK (10km+)</b></span>
           <span>TEMP <b>-1°C / -8°C</b></span>
           <span>QNH <b>Q1024</b></span>
         </div>
       </div>
       <div class="metar-box">
-        <div class="section-label">METAR (7건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RKSI 242200Z 08004KT CAVOK M01/M08 Q1024 NOSIG</div>
+        <div class="section-label">METAR (8건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RKSI 242230Z 08003KT 050V110 CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 242200Z 08004KT CAVOK M01/M08 Q1024 NOSIG</div>
 <div class="metar-line">METAR RKSI 242130Z 09005KT CAVOK M01/M07 Q1024 NOSIG</div>
 <div class="metar-line">METAR RKSI 242100Z 10006KT CAVOK M01/M08 Q1024 NOSIG</div>
 <div class="metar-line">METAR RKSI 242030Z 09003KT 060V120 CAVOK M01/M08 Q1024 NOSIG</div>
@@ -220,7 +221,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKSI.png?t=1795559612" alt="RKSI 7-day forecast" onclick="openModal(this.src, 'RKSI')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     
@@ -231,15 +232,16 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>320°/15kt</b></span>
+          <span>WIND <b>310°/10kt</b></span>
           <span>VIS <b>10km+</b></span>
-          <span>TEMP <b>8°C / -3°C</b></span>
-          <span>QNH <b>Q1011</b></span>
+          <span>TEMP <b>9°C / -3°C</b></span>
+          <span>QNH <b>Q1012</b></span>
         </div>
       </div>
       <div class="metar-box">
-        <div class="section-label">METAR (7건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RJAA 242200Z 32015KT 9999 FEW030 08/M03 Q1011 NOSIG</div>
+        <div class="section-label">METAR (8건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RJAA 242230Z 31010KT 9999 FEW030 09/M03 Q1012 NOSIG</div>
+<div class="metar-line">METAR RJAA 242200Z 32015KT 9999 FEW030 08/M03 Q1011 NOSIG</div>
 <div class="metar-line">METAR RJAA 242130Z 31011KT 270V340 9999 FEW030 08/M03 Q1010 NOSIG</div>
 <div class="metar-line">METAR RJAA 242100Z 31010KT 290V350 9999 FEW030 08/M03 Q1010 NOSIG</div>
 <div class="metar-line">METAR RJAA 242030Z AUTO 32010KT 9999 NSC 08/M03 Q1009 NOSIG</div>
@@ -249,7 +251,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RJAA.png?t=1795559612" alt="RJAA 7-day forecast" onclick="openModal(this.src, 'RJAA')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     
@@ -260,15 +262,16 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>300°/14kt G24</b></span>
+          <span>WIND <b>300°/13kt G23</b></span>
           <span>VIS <b>10km+</b></span>
-          <span>TEMP <b>9°C / 3°C</b></span>
-          <span>QNH <b>Q1019</b></span>
+          <span>TEMP <b>10°C / 3°C</b></span>
+          <span>QNH <b>Q1020</b></span>
         </div>
       </div>
       <div class="metar-box">
-        <div class="section-label">METAR (7건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RJBB 242200Z 30014G24KT 9999 FEW020 BKN040 09/03 Q1019 NOSIG</div>
+        <div class="section-label">METAR (8건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RJBB 242230Z 30013G23KT 250V330 9999 FEW020 BKN040 10/03 Q1020 NOSIG</div>
+<div class="metar-line">METAR RJBB 242200Z 30014G24KT 9999 FEW020 BKN040 09/03 Q1019 NOSIG</div>
 <div class="metar-line">METAR RJBB 242130Z 30013KT 9999 FEW020 SCT040 09/02 Q1019 NOSIG</div>
 <div class="metar-line">METAR RJBB 242100Z 30016KT 9999 FEW020 SCT045 09/02 Q1019 NOSIG</div>
 <div class="metar-line">METAR RJBB 242030Z AUTO 30015G25KT 9999 FEW041 SCT044 BKN050 09/02 Q1018 NOSIG</div>
@@ -278,7 +281,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RJBB.png?t=1795559612" alt="RJBB 7-day forecast" onclick="openModal(this.src, 'RJBB')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     
@@ -289,15 +292,16 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>020°/20kt</b></span>
+          <span>WIND <b>020°/18kt</b></span>
           <span>VIS <b>10km+</b></span>
           <span>TEMP <b>19°C / 12°C</b></span>
           <span>QNH <b>Q1022</b></span>
         </div>
       </div>
       <div class="metar-box">
-        <div class="section-label">METAR (7건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR ROAH 242200Z 02020KT 9999 -SHRA FEW030 BKN045 19/12 Q1022</div>
+        <div class="section-label">METAR (8건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR ROAH 242230Z 02018KT 9999 -SHRA FEW030 BKN045 19/12 Q1022</div>
+<div class="metar-line">METAR ROAH 242200Z 02020KT 9999 -SHRA FEW030 BKN045 19/12 Q1022</div>
 <div class="metar-line">METAR ROAH 242130Z 03015KT 9999 -SHRA FEW035 SCT045 19/12 Q1021</div>
 <div class="metar-line">METAR ROAH 242100Z 01013KT 9999 -SHRA FEW035 BKN045 19/12 Q1021</div>
 <div class="metar-line">METAR ROAH 242030Z AUTO 01014KT 9999 SCT044 BKN047 BKN110 19/11 Q1021</div>
@@ -307,7 +311,7 @@
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/ROAH.png?t=1795559612" alt="ROAH 7-day forecast" onclick="openModal(this.src, 'ROAH')" loading="lazy"></div>
+        <div class="img-scroll"><div class="no-img">예보 표를 불러오지 못했습니다.</div></div>
       </div>
     </section>
     </div>

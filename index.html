@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviation Weather Briefing</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --surface: #ffffff; --text: #111827; --muted: #6b7280;
+    --border: #e5e7eb; --accent: #2563eb; --code-bg: #f8fafc;
+  }
+  [data-theme="dark"] {
+    --bg: #0b1120; --surface: #111827; --text: #f3f4f6; --muted: #9ca3af;
+    --border: #1f2937; --accent: #60a5fa; --code-bg: #0f172a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .brand h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.02em; }
+  .brand .time { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+  .controls { display: flex; gap: 8px; }
+  .btn { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+  .btn:hover { border-color: var(--accent); }
+  main { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .tile { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer; color: inherit; transition: border-color .15s; }
+  .tile:hover, .tile.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .tile-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .icao { font-weight: 800; font-size: 1.05rem; font-family: monospace; }
+  .tile-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.78rem; }
+  .tile-meta span { display: block; color: var(--muted); font-size: 0.68rem; }
+  .badge { font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; color: #fff; }
+  .badge.vfr { background: #16a34a; } .badge.mvfr { background: #2563eb; }
+  .badge.ifr { background: #dc2626; } .badge.lifr { background: #9333ea; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+  .card-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .card-title { display: flex; align-items: center; gap: 10px; }
+  .card-title h2 { margin: 0; font-family: monospace; font-size: 1.35rem; }
+  .card-stats { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--muted); }
+  .card-stats b { color: var(--text); margin-left: 4px; }
+  .section-label { font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.03em; }
+  .metar-list { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.84rem; line-height: 1.6; overflow-x: auto; }
+  .metar-line { padding: 4px 0; border-bottom: 1px dashed var(--border); white-space: pre-wrap; word-break: break-word; }
+  .metar-line:last-child { border-bottom: none; }
+  .forecast-box { margin-top: 16px; }
+  .img-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+  .img-scroll img { display: block; max-width: none; height: auto; cursor: zoom-in; }
+  .no-img { padding: 24px; text-align: center; color: var(--muted); }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+  .modal.open { display: flex; }
+  .modal img { max-width: 96vw; max-height: 92vh; border-radius: 8px; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>✈️ Aviation Weather Briefing</h1>
+    <div class="time">최종 업데이트: 2026-11-25 07:30 KST (242230Z)</div>
+  </div>
+  <div class="controls">
+    <button class="btn" onclick="filterAirport('ALL')">전체 공항 보기</button>
+    <button class="btn" onclick="toggleTheme()">🌙 야간/주간 모드</button>
+  </div>
+</header>
+<main>
+  <div class="tiles">
+    <button class="tile" onclick="filterAirport('RKPC')" data-icao="RKPC">
+      <div class="tile-top">
+        <span class="icao">RKPC</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>310°/08kt</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>9°C / -2°C</strong></div>
+        <div><span>QNH</span><strong>Q1025</strong></div>
+      </div>
+    </button>
+    
+    <button class="tile" onclick="filterAirport('RKSS')" data-icao="RKSS">
+      <div class="tile-top">
+        <span class="icao">RKSS</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>070°/01kt</strong></div>
+        <div><span>VIS</span><strong>CAVOK (10km+)</strong></div>
+        <div><span>TEMP</span><strong>-4°C / -7°C</strong></div>
+        <div><span>QNH</span><strong>Q1024</strong></div>
+      </div>
+    </button>
+    
+    <button class="tile" onclick="filterAirport('RKSI')" data-icao="RKSI">
+      <div class="tile-top">
+        <span class="icao">RKSI</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>080°/04kt</strong></div>
+        <div><span>VIS</span><strong>CAVOK (10km+)</strong></div>
+        <div><span>TEMP</span><strong>-1°C / -8°C</strong></div>
+        <div><span>QNH</span><strong>Q1024</strong></div>
+      </div>
+    </button>
+    
+    <button class="tile" onclick="filterAirport('RJAA')" data-icao="RJAA">
+      <div class="tile-top">
+        <span class="icao">RJAA</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>320°/15kt</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>8°C / -3°C</strong></div>
+        <div><span>QNH</span><strong>Q1011</strong></div>
+      </div>
+    </button>
+    
+    <button class="tile" onclick="filterAirport('RJBB')" data-icao="RJBB">
+      <div class="tile-top">
+        <span class="icao">RJBB</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>300°/14kt G24</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>9°C / 3°C</strong></div>
+        <div><span>QNH</span><strong>Q1019</strong></div>
+      </div>
+    </button>
+    
+    <button class="tile" onclick="filterAirport('ROAH')" data-icao="ROAH">
+      <div class="tile-top">
+        <span class="icao">ROAH</span>
+        <span class="badge vfr">VFR</span>
+      </div>
+      <div class="tile-meta">
+        <div><span>WIND</span><strong>020°/20kt</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>19°C / 12°C</strong></div>
+        <div><span>QNH</span><strong>Q1022</strong></div>
+      </div>
+    </button>
+    </div>
+  <div id="cards">
+    <section class="card" data-icao="RKPC">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>RKPC</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>310°/08kt</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>9°C / -2°C</b></span>
+          <span>QNH <b>Q1025</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (4건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RKPC 242200Z 31008KT 280V350 9999 BKN040 09/M02 Q1025 NOSIG</div>
+<div class="metar-line">METAR RKPC 242100Z 32007KT 9999 BKN030 09/00 Q1025 NOSIG</div>
+<div class="metar-line">METAR RKPC 242000Z 32008KT 9999 BKN040 09/M01 Q1025 NOSIG</div>
+<div class="metar-line">METAR RKPC 241900Z 33009G19KT 9999 BKN035 08/01 Q1025 NOSIG</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/RKPC.png?t=1795559612" alt="RKPC 7-day forecast" onclick="openModal(this.src, 'RKPC')" loading="lazy"></div>
+      </div>
+    </section>
+    
+    <section class="card" data-icao="RKSS">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>RKSS</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>070°/01kt</b></span>
+          <span>VIS <b>CAVOK (10km+)</b></span>
+          <span>TEMP <b>-4°C / -7°C</b></span>
+          <span>QNH <b>Q1024</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (4건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RKSS 242200Z 07001KT CAVOK M04/M07 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSS 242100Z 19001KT CAVOK M05/M05 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSS 242000Z 02002KT CAVOK M06/M06 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSS 241900Z 05001KT CAVOK M05/M07 Q1025 NOSIG</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/RKSS.png?t=1795559612" alt="RKSS 7-day forecast" onclick="openModal(this.src, 'RKSS')" loading="lazy"></div>
+      </div>
+    </section>
+    
+    <section class="card" data-icao="RKSI">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>RKSI</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>080°/04kt</b></span>
+          <span>VIS <b>CAVOK (10km+)</b></span>
+          <span>TEMP <b>-1°C / -8°C</b></span>
+          <span>QNH <b>Q1024</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (7건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RKSI 242200Z 08004KT CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 242130Z 09005KT CAVOK M01/M07 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 242100Z 10006KT CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 242030Z 09003KT 060V120 CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 242000Z 05005KT CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 241930Z 07004KT CAVOK M01/M08 Q1024 NOSIG</div>
+<div class="metar-line">METAR RKSI 241900Z 05005KT CAVOK M01/M08 Q1025 NOSIG</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/RKSI.png?t=1795559612" alt="RKSI 7-day forecast" onclick="openModal(this.src, 'RKSI')" loading="lazy"></div>
+      </div>
+    </section>
+    
+    <section class="card" data-icao="RJAA">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>RJAA</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>320°/15kt</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>8°C / -3°C</b></span>
+          <span>QNH <b>Q1011</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (7건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RJAA 242200Z 32015KT 9999 FEW030 08/M03 Q1011 NOSIG</div>
+<div class="metar-line">METAR RJAA 242130Z 31011KT 270V340 9999 FEW030 08/M03 Q1010 NOSIG</div>
+<div class="metar-line">METAR RJAA 242100Z 31010KT 290V350 9999 FEW030 08/M03 Q1010 NOSIG</div>
+<div class="metar-line">METAR RJAA 242030Z AUTO 32010KT 9999 NSC 08/M03 Q1009 NOSIG</div>
+<div class="metar-line">METAR RJAA 242000Z AUTO 31010KT 9999 NSC 08/M03 Q1008 NOSIG</div>
+<div class="metar-line">METAR RJAA 241930Z AUTO 31007KT 9999 NSC 09/M02 Q1007 NOSIG</div>
+<div class="metar-line">METAR RJAA 241900Z AUTO 31007KT 9999 NSC 09/M02 Q1007 NOSIG</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/RJAA.png?t=1795559612" alt="RJAA 7-day forecast" onclick="openModal(this.src, 'RJAA')" loading="lazy"></div>
+      </div>
+    </section>
+    
+    <section class="card" data-icao="RJBB">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>RJBB</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>300°/14kt G24</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>9°C / 3°C</b></span>
+          <span>QNH <b>Q1019</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (7건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RJBB 242200Z 30014G24KT 9999 FEW020 BKN040 09/03 Q1019 NOSIG</div>
+<div class="metar-line">METAR RJBB 242130Z 30013KT 9999 FEW020 SCT040 09/02 Q1019 NOSIG</div>
+<div class="metar-line">METAR RJBB 242100Z 30016KT 9999 FEW020 SCT045 09/02 Q1019 NOSIG</div>
+<div class="metar-line">METAR RJBB 242030Z AUTO 30015G25KT 9999 FEW041 SCT044 BKN050 09/02 Q1018 NOSIG</div>
+<div class="metar-line">METAR RJBB 242000Z AUTO 31018KT 9999 FEW043 SCT044 BKN047 09/02 Q1018 NOSIG</div>
+<div class="metar-line">METAR RJBB 241930Z AUTO 30013G26KT 9999 FEW045 SCT047 10/04 Q1018 NOSIG</div>
+<div class="metar-line">METAR RJBB 241900Z AUTO 31019KT 260V330 9999 FEW044 SCT046 BKN049 10/03 Q1018 NOSIG</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/RJBB.png?t=1795559612" alt="RJBB 7-day forecast" onclick="openModal(this.src, 'RJBB')" loading="lazy"></div>
+      </div>
+    </section>
+    
+    <section class="card" data-icao="ROAH">
+      <div class="card-header">
+        <div class="card-title">
+          <h2>ROAH</h2>
+          <span class="badge vfr">VFR</span>
+        </div>
+        <div class="card-stats">
+          <span>WIND <b>020°/20kt</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>19°C / 12°C</b></span>
+          <span>QNH <b>Q1022</b></span>
+        </div>
+      </div>
+      <div class="metar-box">
+        <div class="section-label">METAR (7건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR ROAH 242200Z 02020KT 9999 -SHRA FEW030 BKN045 19/12 Q1022</div>
+<div class="metar-line">METAR ROAH 242130Z 03015KT 9999 -SHRA FEW035 SCT045 19/12 Q1021</div>
+<div class="metar-line">METAR ROAH 242100Z 01013KT 9999 -SHRA FEW035 BKN045 19/12 Q1021</div>
+<div class="metar-line">METAR ROAH 242030Z AUTO 01014KT 9999 SCT044 BKN047 BKN110 19/11 Q1021</div>
+<div class="metar-line">METAR ROAH 242000Z AUTO 01016KT 9999 FEW041 BKN044 BKN050 19/10 Q1021</div>
+<div class="metar-line">METAR ROAH 241930Z AUTO 01020KT 9999 SCT038 BKN045 OVC050 19/11 Q1020</div>
+<div class="metar-line">METAR ROAH 241900Z AUTO 01020KT 9999 FEW036 SCT041 BKN046 19/11 Q1020</div></div>
+      </div>
+      <div class="forecast-box">
+        <div class="section-label">WINDY 7-DAY FORECAST <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
+        <div class="img-scroll"><img src="images/ROAH.png?t=1795559612" alt="ROAH 7-day forecast" onclick="openModal(this.src, 'ROAH')" loading="lazy"></div>
+      </div>
+    </section>
+    </div>
+</main>
+<div id="modal" class="modal" onclick="this.classList.remove('open')">
+  <img id="modal-img" src="" alt="확대 보기">
+</div>
+<script>
+  let activeIcao = 'ALL';
+  function filterAirport(icao) {
+    activeIcao = (activeIcao === icao && icao !== 'ALL') ? 'ALL' : icao;
+    document.querySelectorAll('.card').forEach(c => {
+      c.style.display = (activeIcao === 'ALL' || c.dataset.icao === activeIcao) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tile').forEach(t => {
+      t.classList.toggle('active', t.dataset.icao === activeIcao);
+    });
+  }
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  }
+  function openModal(src) {
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal').classList.add('open');
+  }
+</script>
+</body>
+</html>

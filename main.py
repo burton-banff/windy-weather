@@ -15,7 +15,7 @@ with open("airports.txt", "r", encoding="utf-8") as f:
 
 os.makedirs("images", exist_ok=True)
 
-# 2. 최근 METAR 전체 가져오기 (AviationWeather 공식 API - 최근 4시간, 줄임 없이 전체)
+# 2. 최근 METAR 전체 가져오기 (최근 4시간, 줄임 없이 전체)
 def fetch_metars(icao):
     url = f"https://aviationweather.gov/api/data/metar?ids={icao}&hours=4"
     try:
@@ -27,13 +27,9 @@ def fetch_metars(icao):
     except Exception as e:
         return [f"{icao} METAR 조회 오류: {e}"]
 
-# 3. 최신 METAR에서 요약 정보(바람, 시정, 기온, 기압, 비행상태) 파싱
+# 3. 최신 METAR 요약 파싱
 def parse_latest_metar(metar_line):
-    wind = "-"
-    vis = "-"
-    temp = "-"
-    qnh = "-"
-    cat = "VFR"
+    wind, vis, temp, qnh, cat = "-", "-", "-", "-", "VFR"
 
     m_wind = re.search(r"\b(\d{3}|VRB)(\d{2,3})(G(\d{2,3}))?KT\b", metar_line)
     if m_wind:
@@ -66,13 +62,13 @@ def parse_latest_metar(metar_line):
 
     return {"wind": wind, "vis": vis, "temp": temp, "qnh": qnh, "cat": cat}
 
-# 4. Headless Chrome으로 Windy 7일 예보 표 캡처
+# 4. Headless Chrome으로 Windy 7일 예보 표만 DOM 적출 캡처
 def capture_windy(airports):
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--window-size=3200,1200")
     options.add_argument("--force-device-scale-factor=1")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
@@ -82,42 +78,64 @@ def capture_windy(airports):
 
     try:
         for icao in airports:
-            print(f"[{icao}] Windy 캡처 시작...")
+            print(f"[{icao}] Windy 예보 표 적출 시작...", flush=True)
             img_path = f"images/{icao}.png"
             try:
                 driver.get(f"https://www.windy.com/airport/{icao}")
                 time.sleep(6)
 
-                # Meteogram(상세 예보 표) 영역 찾기 및 전체 너비로 확장 후 캡처
+                # 예보 표(Meteogram / Detail table) 대기
                 table_el = wait.until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "#detail-data-table, .detail-data-table, table.forecast-table"))
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "#detail-data-table, table.forecast-table, .table-wrapper table"))
                 )
                 time.sleep(2)
 
-                # 스크롤 잘림 방지를 위해 컨테이너 스타일 임시 확장
-                driver.execute_script("""
-                    const el = arguments[0];
-                    let p = el.parentElement;
-                    for (let i = 0; i < 5 && p; i++) {
-                        p.style.overflow = 'visible';
-                        p.style.maxWidth = 'none';
-                        p = p.parentElement;
-                    }
-                    el.scrollIntoView({block: 'center'});
+                # [핵심] 지도/껍데기 전부 숨기고 예보 표 알맹이만 깨끗한 박스로 적출
+                box = driver.execute_script("""
+                    const table = arguments[0];
+                    const existing = document.getElementById('clean-capture-box');
+                    if (existing) existing.remove();
+
+                    const box = document.createElement('div');
+                    box.id = 'clean-capture-box';
+                    box.style.position = 'fixed';
+                    box.style.top = '0';
+                    box.style.left = '0';
+                    box.style.zIndex = '9999999';
+                    box.style.background = '#ffffff';
+                    box.style.padding = '12px';
+                    box.style.display = 'inline-block';
+
+                    // 표를 통째로 새 박스로 이동 (스타일 및 아이콘 유지)
+                    box.appendChild(table);
+                    document.body.appendChild(box);
+
+                    // 나머지 지도, 팝업, 메뉴 전부 숨김
+                    Array.from(document.body.children).forEach(el => {
+                        if (el.id !== 'clean-capture-box') {
+                            el.style.display = 'none';
+                        }
+                    });
+                    document.body.style.background = '#ffffff';
+                    document.body.style.overflow = 'visible';
+
+                    return box;
                 """, table_el)
+
                 time.sleep(1)
 
-                table_el.screenshot(img_path)
+                # 표 실제 너비에 맞춰 창 크기 자동 조정 (가로 잘림 방지)
+                width = driver.execute_script("return arguments[0].scrollWidth;", box)
+                height = driver.execute_script("return arguments[0].scrollHeight;", box)
+                driver.set_window_size(max(width + 40, 1400), max(height + 40, 600))
+                time.sleep(0.5)
+
+                box.screenshot(img_path)
                 captured[icao] = img_path
-                print(f" -> [{icao}] 캡처 완료")
+                print(f" -> [{icao}] 적출 캡처 완료 ({width}x{height})", flush=True)
             except Exception as e:
-                print(f" -> [{icao}] 캡처 실패: {e}")
-                # 실패 시 전체 화면이라도 백업 캡처
-                try:
-                    driver.save_screenshot(img_path)
-                    captured[icao] = img_path
-                except Exception:
-                    captured[icao] = ""
+                print(f" -> [{icao}] 캡처 실패: {e}", flush=True)
+                captured[icao] = ""
     finally:
         driver.quit()
 
@@ -141,7 +159,7 @@ for icao in AIRPORTS:
         "img": captured_imgs.get(icao, "")
     })
 
-# 6. HTML 대시보드 생성 (METAR 전체 노출 + 원본 캡처 이미지)
+# 6. HTML 대시보드 생성
 tiles_html = ""
 cards_html = ""
 
@@ -166,9 +184,9 @@ for item in airport_data:
 
     metar_lines_html = "\n".join([f'<div class="metar-line">{line}</div>' for line in item["metars"]])
     img_html = (
-        f'<img src="{item["img"]}?t={int(time.time())}" alt="{icao} 7-day forecast" onclick="openModal(this.src, \'{icao}\')" loading="lazy">'
+        f'<img src="{item["img"]}?t={int(time.time())}" alt="{icao} 7-day forecast" onclick="openModal(this.src)" loading="lazy">'
         if item["img"]
-        else '<div class="no-img">예보 이미지를 불러오지 못했습니다.</div>'
+        else '<div class="no-img">예보 표를 불러오지 못했습니다.</div>'
     )
 
     cards_html += f"""
@@ -232,66 +250,4 @@ html = f"""<!DOCTYPE html>
   .badge.ifr {{ background: #dc2626; }} .badge.lifr {{ background: #9333ea; }}
   .card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }}
   .card-header {{ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }}
-  .card-title {{ display: flex; align-items: center; gap: 10px; }}
-  .card-title h2 {{ margin: 0; font-family: monospace; font-size: 1.35rem; }}
-  .card-stats {{ display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--muted); }}
-  .card-stats b {{ color: var(--text); margin-left: 4px; }}
-  .section-label {{ font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.03em; }}
-  .metar-list {{ background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.84rem; line-height: 1.6; overflow-x: auto; }}
-  .metar-line {{ padding: 4px 0; border-bottom: 1px dashed var(--border); white-space: pre-wrap; word-break: break-word; }}
-  .metar-line:last-child {{ border-bottom: none; }}
-  .forecast-box {{ margin-top: 16px; }}
-  .img-scroll {{ overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; }}
-  .img-scroll img {{ display: block; max-width: none; height: auto; cursor: zoom-in; }}
-  .no-img {{ padding: 24px; text-align: center; color: var(--muted); }}
-  .modal {{ display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }}
-  .modal.open {{ display: flex; }}
-  .modal img {{ max-width: 96vw; max-height: 92vh; border-radius: 8px; background: #fff; }}
-</style>
-</head>
-<body>
-<header>
-  <div class="brand">
-    <h1>✈️ Aviation Weather Briefing</h1>
-    <div class="time">최종 업데이트: {now_kst} ({now_utc})</div>
-  </div>
-  <div class="controls">
-    <button class="btn" onclick="filterAirport('ALL')">전체 공항 보기</button>
-    <button class="btn" onclick="toggleTheme()">🌙 야간/주간 모드</button>
-  </div>
-</header>
-<main>
-  <div class="tiles">{tiles_html}</div>
-  <div id="cards">{cards_html}</div>
-</main>
-<div id="modal" class="modal" onclick="this.classList.remove('open')">
-  <img id="modal-img" src="" alt="확대 보기">
-</div>
-<script>
-  let activeIcao = 'ALL';
-  function filterAirport(icao) {{
-    activeIcao = (activeIcao === icao && icao !== 'ALL') ? 'ALL' : icao;
-    document.querySelectorAll('.card').forEach(c => {{
-      c.style.display = (activeIcao === 'ALL' || c.dataset.icao === activeIcao) ? 'block' : 'none';
-    }});
-    document.querySelectorAll('.tile').forEach(t => {{
-      t.classList.toggle('active', t.dataset.icao === activeIcao);
-    }});
-  }}
-  function toggleTheme() {{
-    const cur = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
-  }}
-  function openModal(src) {{
-    document.getElementById('modal-img').src = src;
-    document.getElementById('modal').classList.add('open');
-  }}
-</script>
-</body>
-</html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html)
-
-print("index.html 생성 완료!")
+  .

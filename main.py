@@ -250,4 +250,66 @@ html = f"""<!DOCTYPE html>
   .badge.ifr {{ background: #dc2626; }} .badge.lifr {{ background: #9333ea; }}
   .card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }}
   .card-header {{ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }}
-  .
+  .card-title {{ display: flex; align-items: center; gap: 10px; }}
+  .card-title h2 {{ margin: 0; font-family: monospace; font-size: 1.35rem; }}
+  .card-stats {{ display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--muted); }}
+  .card-stats b {{ color: var(--text); margin-left: 4px; }}
+  .section-label {{ font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.03em; }}
+  .metar-list {{ background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.84rem; line-height: 1.6; overflow-x: auto; }}
+  .metar-line {{ padding: 4px 0; border-bottom: 1px dashed var(--border); white-space: pre-wrap; word-break: break-word; }}
+  .metar-line:last-child {{ border-bottom: none; }}
+  .forecast-box {{ margin-top: 16px; }}
+  .img-scroll {{ overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #fff; }}
+  .img-scroll img {{ display: block; max-width: none; height: auto; cursor: zoom-in; }}
+  .no-img {{ padding: 24px; text-align: center; color: var(--muted); }}
+  .modal {{ display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }}
+  .modal.open {{ display: flex; }}
+  .modal img {{ max-width: 96vw; max-height: 92vh; border-radius: 8px; background: #fff; }}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>✈️ Aviation Weather Briefing</h1>
+    <div class="time">최종 업데이트: {now_kst} ({now_utc})</div>
+  </div>
+  <div class="controls">
+    <button class="btn" onclick="filterAirport('ALL')">전체 공항 보기</button>
+    <button class="btn" onclick="toggleTheme()">🌙 야간/주간 모드</button>
+  </div>
+</header>
+<main>
+  <div class="tiles">{tiles_html}</div>
+  <div id="cards">{cards_html}</div>
+</main>
+<div id="modal" class="modal" onclick="this.classList.remove('open')">
+  <img id="modal-img" src="" alt="확대 보기">
+</div>
+<script>
+  let activeIcao = 'ALL';
+  function filterAirport(icao) {{
+    activeIcao = (activeIcao === icao && icao !== 'ALL') ? 'ALL' : icao;
+    document.querySelectorAll('.card').forEach(c => {{
+      c.style.display = (activeIcao === 'ALL' || c.dataset.icao === activeIcao) ? 'block' : 'none';
+    }});
+    document.querySelectorAll('.tile').forEach(t => {{
+      t.classList.toggle('active', t.dataset.icao === activeIcao);
+    }});
+  }}
+  function toggleTheme() {{
+    const cur = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  }}
+  function openModal(src) {{
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal').classList.add('open');
+  }}
+</script>
+</body>
+</html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+
+print("index.html 생성 완료!", flush=True)

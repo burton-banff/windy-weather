@@ -55,7 +55,7 @@
 <header>
   <div class="brand">
     <h1>✈️ Aviation Weather Briefing</h1>
-    <div class="time">최종 업데이트: 2026-11-28 04:13 KST (271913Z)</div>
+    <div class="time">최종 업데이트: 2026-11-28 12:37 KST (280337Z)</div>
   </div>
   <div class="controls">
     <button class="btn" onclick="filterAirport('ALL')">전체 공항 보기</button>
@@ -70,10 +70,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>330°/16kt G28</strong></div>
-        <div><span>VIS</span><strong>9000m</strong></div>
-        <div><span>TEMP</span><strong>14°C / 7°C</strong></div>
-        <div><span>QNH</span><strong>Q1017</strong></div>
+        <div><span>WIND</span><strong>300°/19kt G39</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>13°C / 2°C</strong></div>
+        <div><span>QNH</span><strong>Q1018</strong></div>
       </div>
     </button>
     
@@ -83,10 +83,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>260°/05kt</strong></div>
+        <div><span>WIND</span><strong>300°/16kt</strong></div>
         <div><span>VIS</span><strong>CAVOK (10km+)</strong></div>
-        <div><span>TEMP</span><strong>8°C / 4°C</strong></div>
-        <div><span>QNH</span><strong>Q1013</strong></div>
+        <div><span>TEMP</span><strong>10°C / -4°C</strong></div>
+        <div><span>QNH</span><strong>Q1015</strong></div>
       </div>
     </button>
     
@@ -96,23 +96,23 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>290°/09kt</strong></div>
-        <div><span>VIS</span><strong>CAVOK (10km+)</strong></div>
-        <div><span>TEMP</span><strong>9°C / 2°C</strong></div>
-        <div><span>QNH</span><strong>Q1013</strong></div>
+        <div><span>WIND</span><strong>310°/17kt</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>8°C / -1°C</strong></div>
+        <div><span>QNH</span><strong>Q1015</strong></div>
       </div>
     </button>
     
     <button class="tile" onclick="filterAirport('RJAA')" data-icao="RJAA">
       <div class="tile-top">
         <span class="icao">RJAA</span>
-        <span class="badge vfr">VFR</span>
+        <span class="badge mvfr">MVFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>150°/05kt</strong></div>
-        <div><span>VIS</span><strong>10km+</strong></div>
-        <div><span>TEMP</span><strong>15°C / 14°C</strong></div>
-        <div><span>QNH</span><strong>Q1011</strong></div>
+        <div><span>WIND</span><strong>250°/03kt</strong></div>
+        <div><span>VIS</span><strong>7000m</strong></div>
+        <div><span>TEMP</span><strong>13°C / 12°C</strong></div>
+        <div><span>QNH</span><strong>Q0999</strong></div>
       </div>
     </button>
     
@@ -122,10 +122,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>060°/07kt</strong></div>
-        <div><span>VIS</span><strong>8000m</strong></div>
-        <div><span>TEMP</span><strong>15°C / 14°C</strong></div>
-        <div><span>QNH</span><strong>Q1009</strong></div>
+        <div><span>WIND</span><strong>260°/14kt</strong></div>
+        <div><span>VIS</span><strong>10km+</strong></div>
+        <div><span>TEMP</span><strong>18°C / 14°C</strong></div>
+        <div><span>QNH</span><strong>Q1007</strong></div>
       </div>
     </button>
     
@@ -135,10 +135,10 @@
         <span class="badge vfr">VFR</span>
       </div>
       <div class="tile-meta">
-        <div><span>WIND</span><strong>330°/16kt</strong></div>
+        <div><span>WIND</span><strong>340°/23kt</strong></div>
         <div><span>VIS</span><strong>10km+</strong></div>
-        <div><span>TEMP</span><strong>23°C / 19°C</strong></div>
-        <div><span>QNH</span><strong>Q1016</strong></div>
+        <div><span>TEMP</span><strong>22°C / 15°C</strong></div>
+        <div><span>QNH</span><strong>Q1020</strong></div>
       </div>
     </button>
     </div>
@@ -150,22 +150,24 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>330°/16kt G28</b></span>
-          <span>VIS <b>9000m</b></span>
-          <span>TEMP <b>14°C / 7°C</b></span>
-          <span>QNH <b>Q1017</b></span>
+          <span>WIND <b>300°/19kt G39</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>13°C / 2°C</b></span>
+          <span>QNH <b>Q1018</b></span>
         </div>
       </div>
       <div class="metar-box">
-        <div class="section-label">METAR (4건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RKPC 271900Z 33016G28KT 9000 BKN025 BKN170 14/07 Q1017 WS R13 R31 NOSIG</div>
-<div class="metar-line">METAR RKPC 271800Z 32014KT 7000 BKN030 14/07 Q1017 WS R13 R31 NOSIG</div>
-<div class="metar-line">METAR RKPC 271700Z 31014G25KT 280V350 7000 BKN030 15/09 Q1016 NOSIG</div>
-<div class="metar-line">METAR RKPC 271600Z 31011KT 280V340 6000 FEW015 BKN030 15/10 Q1016 NOSIG</div></div>
+        <div class="section-label">METAR (6건 전체 표시)</div>
+        <div class="metar-list"><div class="metar-line">METAR RKPC 280300Z 30019G39KT 270V330 9999 BKN035 BKN100 13/02 Q1018 WS R07 R25 NOSIG</div>
+<div class="metar-line">METAR RKPC 280200Z 31015KT 270V330 9999 SCT025 BKN110 12/04 Q1019 WS R13 R31 NOSIG</div>
+<div class="metar-line">METAR RKPC 280100Z 26014G31KT 240V300 9999 -SHRA FEW015 BKN045 09/06 Q1019 WS ALL RWY NOSIG</div>
+<div class="metar-line">SPECI RKPC 280049Z 29022G42KT 260V330 2000 SHRA SCT025 BKN040 10/07 Q1019 WS ALL RWY NOSIG</div>
+<div class="metar-line">SPECI RKPC 280044Z 30016G42KT 270V330 5000 -SHRA FEW025 BKN045 12/06 Q1019 WS ALL RWY NOSIG</div>
+<div class="metar-line">METAR RKPC 280000Z 32012KT 280V360 9999 SCT045 13/02 Q1018 WS R13 R31 NOSIG</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKPC.png?t=1795806982" alt="RKPC Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/RKPC.png?t=1795837218" alt="RKPC Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     
@@ -176,22 +178,22 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>260°/05kt</b></span>
+          <span>WIND <b>300°/16kt</b></span>
           <span>VIS <b>CAVOK (10km+)</b></span>
-          <span>TEMP <b>8°C / 4°C</b></span>
-          <span>QNH <b>Q1013</b></span>
+          <span>TEMP <b>10°C / -4°C</b></span>
+          <span>QNH <b>Q1015</b></span>
         </div>
       </div>
       <div class="metar-box">
         <div class="section-label">METAR (4건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RKSS 271900Z 26005KT CAVOK 08/04 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSS 271800Z 27006KT 5000 BR NSC 08/05 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSS 271700Z 27006KT 3500 BR SCT035 08/07 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSS 271600Z 27004KT 3000 BR SCT035 08/08 Q1013 NOSIG</div></div>
+        <div class="metar-list"><div class="metar-line">METAR RKSS 280300Z 30016KT 270V330 CAVOK 10/M04 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSS 280200Z 31014KT CAVOK 10/M02 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSS 280100Z 29010KT CAVOK 09/M02 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSS 280000Z 27004KT CAVOK 08/00 Q1014 NOSIG</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKSS.png?t=1795806982" alt="RKSS Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/RKSS.png?t=1795837218" alt="RKSS Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     
@@ -202,26 +204,26 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>290°/09kt</b></span>
-          <span>VIS <b>CAVOK (10km+)</b></span>
-          <span>TEMP <b>9°C / 2°C</b></span>
-          <span>QNH <b>Q1013</b></span>
+          <span>WIND <b>310°/17kt</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>8°C / -1°C</b></span>
+          <span>QNH <b>Q1015</b></span>
         </div>
       </div>
       <div class="metar-box">
         <div class="section-label">METAR (8건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RKSI 271900Z 29009KT CAVOK 09/02 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271830Z 30008KT CAVOK 09/03 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271800Z 28010KT CAVOK 09/03 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271730Z 28010KT CAVOK 09/03 Q1014 NOSIG</div>
-<div class="metar-line">METAR RKSI 271700Z 29010KT CAVOK 09/04 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271630Z 29012KT 9000 NSC 10/04 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271600Z 28011KT 8000 FEW045 SCT200 10/06 Q1013 NOSIG</div>
-<div class="metar-line">METAR RKSI 271530Z 28012KT 7000 FEW030 BKN200 10/06 Q1014 NOSIG</div></div>
+        <div class="metar-list"><div class="metar-line">METAR RKSI 280330Z 31017KT 9999 FEW035 SCT070 08/M01 Q1015 WS R16L R34R R16R R34L NOSIG</div>
+<div class="metar-line">METAR RKSI 280300Z 31017KT 9999 FEW035 BKN070 09/M00 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSI 280230Z 31018G28KT CAVOK 09/M00 Q1015 WS R16L R34R R16R R34L NOSIG</div>
+<div class="metar-line">METAR RKSI 280200Z 31017KT CAVOK 09/00 Q1015 WS R16L R34R R16R R34L NOSIG</div>
+<div class="metar-line">METAR RKSI 280130Z 32017KT CAVOK 09/02 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSI 280100Z 31015KT CAVOK 08/01 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSI 280030Z 30013KT CAVOK 09/02 Q1015 NOSIG</div>
+<div class="metar-line">METAR RKSI 280000Z 32009KT CAVOK 09/01 Q1015 NOSIG</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RKSI.png?t=1795806982" alt="RKSI Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/RKSI.png?t=1795837218" alt="RKSI Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     
@@ -229,29 +231,29 @@
       <div class="card-header">
         <div class="card-title">
           <h2>RJAA</h2>
-          <span class="badge vfr">VFR</span>
+          <span class="badge mvfr">MVFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>150°/05kt</b></span>
-          <span>VIS <b>10km+</b></span>
-          <span>TEMP <b>15°C / 14°C</b></span>
-          <span>QNH <b>Q1011</b></span>
+          <span>WIND <b>250°/03kt</b></span>
+          <span>VIS <b>7000m</b></span>
+          <span>TEMP <b>13°C / 12°C</b></span>
+          <span>QNH <b>Q0999</b></span>
         </div>
       </div>
       <div class="metar-box">
         <div class="section-label">METAR (8건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RJAA 271900Z AUTO 15005KT 9999 -RA FEW012 SCT020 BKN060 15/14 Q1011 TEMPO 4000 -SHRA BR FEW005 BKN012 BECMG 30006KT</div>
-<div class="metar-line">METAR RJAA 271830Z AUTO 17004KT 9999 -RA FEW019 BKN070 BKN080 15/14 Q1012 TEMPO 4000 -SHRA BR FEW005 BKN012</div>
-<div class="metar-line">METAR RJAA 271800Z AUTO 21004KT 8000 -RA NSC 14/14 Q1013 TEMPO 4000 -SHRA BR FEW005 BKN012</div>
-<div class="metar-line">METAR RJAA 271730Z AUTO 13006KT 9999 -RA NSC 14/13 Q1013 TEMPO 4000 -SHRA BR</div>
-<div class="metar-line">METAR RJAA 271700Z AUTO 19005KT 9999 -RA NSC 15/14 Q1014 TEMPO 4000 -SHRA BR</div>
-<div class="metar-line">METAR RJAA 271630Z AUTO 20005KT 9999 -RA FEW019 SCT060 BKN100 15/13 Q1014 NOSIG</div>
-<div class="metar-line">METAR RJAA 271600Z AUTO 18005KT 9999 -RA FEW025 BKN033 OVC090 15/13 Q1014 NOSIG</div>
-<div class="metar-line">METAR RJAA 271530Z AUTO 18003KT 9999 -RA SCT025 BKN029 BKN090 15/13 Q1015 NOSIG</div></div>
+        <div class="metar-list"><div class="metar-line">METAR RJAA 280330Z 25003KT 210V300 7000 FEW002 SCT004 BKN020 13/12 Q0999 BECMG 22008KT</div>
+<div class="metar-line">METAR RJAA 280300Z 28004KT 220V310 4500 -SHRA BR FEW001 BKN002 BKN003 12/12 Q1000 BECMG 22008KT 6000 NSW FEW005 BKN012</div>
+<div class="metar-line">METAR RJAA 280230Z 29005KT 260V340 2200 -SHRA BR SCT001 BKN002 12/11 Q1001 BECMG FM0400 6000 NSW</div>
+<div class="metar-line">METAR RJAA 280200Z 29006KT 250V320 1500 R34L/1800D R34R/2000N -SHRA BR SCT001 BKN002 11/11 Q1002 BECMG 3000 -SHRA BR</div>
+<div class="metar-line">METAR RJAA 280130Z 32008KT 1800 R34L/1500VP2000U R34R/1800U -SHRA BR FEW001 BKN002 BKN003 11/11 Q1003 NOSIG</div>
+<div class="metar-line">METAR RJAA 280100Z 32011KT 2200 R34L/2000N R34R/P2000N -SHRA BR SCT002 BKN003 10/10 Q1003 TEMPO SHRA BR</div>
+<div class="metar-line">METAR RJAA 280030Z 32009KT 2200 -SHRA BR FEW001 SCT002 BKN003 10/09 Q1004 BECMG 6000 -SHRA</div>
+<div class="metar-line">METAR RJAA 280000Z 29009KT 260V330 1500 R34L/P2000N R34R/P2000N SHRA BR SCT001 BKN002 10/09 Q1006 BECMG 6000 -SHRA</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RJAA.png?t=1795806982" alt="RJAA Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/RJAA.png?t=1795837218" alt="RJAA Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     
@@ -262,26 +264,26 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>060°/07kt</b></span>
-          <span>VIS <b>8000m</b></span>
-          <span>TEMP <b>15°C / 14°C</b></span>
-          <span>QNH <b>Q1009</b></span>
+          <span>WIND <b>260°/14kt</b></span>
+          <span>VIS <b>10km+</b></span>
+          <span>TEMP <b>18°C / 14°C</b></span>
+          <span>QNH <b>Q1007</b></span>
         </div>
       </div>
       <div class="metar-box">
         <div class="section-label">METAR (8건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR RJBB 271900Z AUTO 06007KT 8000 -RA FEW003 BKN005 OVC110 15/14 Q1009 BECMG FEW014 SCT025</div>
-<div class="metar-line">METAR RJBB 271830Z AUTO 03007KT 9999 -RA BKN015 OVC017 //////TCU 15/14 Q1010 NOSIG</div>
-<div class="metar-line">METAR RJBB 271800Z AUTO 03008KT 9999 -RA FEW017 BKN019 OVC060 15/14 Q1010 NOSIG</div>
-<div class="metar-line">METAR RJBB 271730Z AUTO 04009KT 9999 -RA FEW013 SCT018 BKN035 15/13 Q1011 NOSIG</div>
-<div class="metar-line">METAR RJBB 271700Z AUTO 03008KT 9999 FEW012 BKN014 OVC070 15/13 Q1011 BECMG TL1800 FEW010 SCT013 BKN020</div>
-<div class="metar-line">METAR RJBB 271630Z AUTO 09007KT 030V120 9999 -RA FEW023 BKN070 OVC080 15/13 Q1011 NOSIG</div>
-<div class="metar-line">METAR RJBB 271600Z AUTO 07008KT 5000 -RA BR SCT014 SCT038 BKN050 15/13 Q1012 TEMPO 4000 -SHRA BR</div>
-<div class="metar-line">METAR RJBB 271530Z AUTO 05006KT 9999 -RA FEW012 SCT038 BKN044 //////TCU 15/13 Q1012 NOSIG</div></div>
+        <div class="metar-list"><div class="metar-line">METAR RJBB 280330Z 26014KT 9999 FEW010 SCT040 BKN070 18/14 Q1007 NOSIG</div>
+<div class="metar-line">METAR RJBB 280300Z 27014KT 9999 VCSH FEW010 SCT040 BKN070 18/14 Q1007 NOSIG</div>
+<div class="metar-line">METAR RJBB 280230Z 27011KT 9999 -SHRA FEW010 BKN020 FEW025CB BKN050 17/15 Q1008 NOSIG</div>
+<div class="metar-line">METAR RJBB 280200Z 26014KT 9999 VCSH FEW010 BKN020 BKN050 17/15 Q1008 NOSIG</div>
+<div class="metar-line">METAR RJBB 280130Z 26016KT 9999 FEW010 SCT020 BKN080 17/15 Q1008 NOSIG</div>
+<div class="metar-line">METAR RJBB 280100Z 26015KT 9999 -SHRA FEW008 BKN010 BKN020 17/16 Q1008 BECMG FEW012 BKN020</div>
+<div class="metar-line">METAR RJBB 280030Z 24006KT 9999 VCSH FEW002 SCT007 BKN010 17/16 Q1008 BECMG FEW012 BKN020</div>
+<div class="metar-line">METAR RJBB 280000Z 23006KT 7000 -RA BR FEW001 SCT007 BKN010 16/15 Q1008 BECMG FEW010 SCT025 BKN040</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/RJBB.png?t=1795806982" alt="RJBB Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/RJBB.png?t=1795837218" alt="RJBB Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     
@@ -292,26 +294,26 @@
           <span class="badge vfr">VFR</span>
         </div>
         <div class="card-stats">
-          <span>WIND <b>330°/16kt</b></span>
+          <span>WIND <b>340°/23kt</b></span>
           <span>VIS <b>10km+</b></span>
-          <span>TEMP <b>23°C / 19°C</b></span>
-          <span>QNH <b>Q1016</b></span>
+          <span>TEMP <b>22°C / 15°C</b></span>
+          <span>QNH <b>Q1020</b></span>
         </div>
       </div>
       <div class="metar-box">
         <div class="section-label">METAR (8건 전체 표시)</div>
-        <div class="metar-list"><div class="metar-line">METAR ROAH 271900Z AUTO 33016KT 9999 FEW018 SCT021 BKN024 23/19 Q1016</div>
-<div class="metar-line">METAR ROAH 271830Z AUTO 33014KT 9999 FEW019 SCT050 OVC060 23/20 Q1016</div>
-<div class="metar-line">METAR ROAH 271800Z AUTO 33015KT 9999 FEW017 SCT031 BKN050 23/19 Q1016</div>
-<div class="metar-line">METAR ROAH 271730Z AUTO 33015KT 9999 SCT017 SCT031 BKN050 23/20 Q1016</div>
-<div class="metar-line">METAR ROAH 271700Z AUTO 32014KT 9999 FEW016 BKN050 OVC170 24/21 Q1016</div>
-<div class="metar-line">METAR ROAH 271630Z AUTO 32012KT 9999 FEW017 BKN150 OVC220 24/21 Q1016</div>
-<div class="metar-line">METAR ROAH 271600Z AUTO 32012KT 9999 SCT016 SCT020 BKN060 24/21 Q1016</div>
-<div class="metar-line">METAR ROAH 271530Z AUTO 32012KT 9999 FEW017 OVC070 24/21 Q1016</div></div>
+        <div class="metar-list"><div class="metar-line">METAR ROAH 280330Z 34023KT 9999 VCSH FEW028 BKN037 22/15 Q1020</div>
+<div class="metar-line">METAR ROAH 280300Z 35021KT 9999 -RA FEW029 BKN037 BKN110 22/14 Q1020</div>
+<div class="metar-line">METAR ROAH 280230Z 34022KT 9999 -RA FEW029 SCT037 BKN110 22/15 Q1020</div>
+<div class="metar-line">METAR ROAH 280200Z 35022KT 9999 -RA FEW028 SCT038 BKN110 22/14 Q1020</div>
+<div class="metar-line">METAR ROAH 280130Z 35023KT 9999 -RA FEW029 SCT035 BKN140 22/16 Q1020</div>
+<div class="metar-line">METAR ROAH 280100Z 34021KT 9999 -RA FEW039 SCT120 BKN140 22/14 Q1020</div>
+<div class="metar-line">METAR ROAH 280030Z 34020KT 9999 FEW033 BKN070 BKN150 22/15 Q1020</div>
+<div class="metar-line">METAR ROAH 280000Z 34021KT 9999 -RA FEW030 BKN070 22/16 Q1019</div></div>
       </div>
       <div class="forecast-box">
         <div class="section-label">WINDY AIRPORT METEOGRAM <small>(클릭 시 확대 / 모바일 좌우 스크롤)</small></div>
-        <div class="img-scroll"><img src="images/ROAH.png?t=1795806982" alt="ROAH Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
+        <div class="img-scroll"><img src="images/ROAH.png?t=1795837218" alt="ROAH Meteogram" onclick="openModal(this.src)" loading="lazy"></div>
       </div>
     </section>
     </div>
